@@ -1,0 +1,29 @@
+#data
+data/
+  .gitignore
+  Aeroplanes/
+      .gitkeep
+  Birds/
+      .gitkeep
+  Drones/
+      .gitkeep
+
+# Jupyter
+
+.ipynb_checkpoints/
+.jupyter/
+
+# macOs
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE
+.vscode/
+.idea
+
+#logs
+logs/
+*.log
