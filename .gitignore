@@ -8,6 +8,18 @@ data/
   Drones/
       .gitkeep
 
+data_split/
+
+# Making sure the data is secure 
+*.jpg
+*.jpeg
+*.png
+*.svg
+
+# Weights 
+*.h5
+*.keras
+
 # Jupyter
 
 .ipynb_checkpoints/
