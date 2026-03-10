@@ -15,6 +15,7 @@ data_split/
 *.jpeg
 *.png
 *.svg
+*.webp
 
 # Weights 
 *.h5

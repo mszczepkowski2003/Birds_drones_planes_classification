@@ -1,7 +1,9 @@
 import tensorflow as tf
 import numpy as np 
+import matplotlib.pyplot as plt 
+from typing import Dict, Any
 
-from src.model.config import IMG_SIZE
+from app.config import IMG_SIZE, CLASS_NAMES_DICT
 
 IMG_SHAPE = IMG_SIZE + (3,)
 
@@ -45,6 +47,25 @@ def get_preds(dataset, model):
     y_pred = np.argmax(predictions, axis=1)
     return y_true, y_pred, predictions
 
+
+def predict_single_image(imagepath: str, model: tf.keras.models.Model) -> None:
+    ori_img = tf.keras.utils.load_img(imagepath)
+    img = tf.keras.utils.load_img(imagepath, target_size=IMG_SIZE)
+
+    img_array = tf.keras.utils.img_to_array(img)
+
+    img_array = tf.expand_dims(img_array, 0)
+
+    probabilities = model.predict(img_array)
+    pred = np.argmax(probabilities)
+    pred_proba = np.max(probabilities)
+    plt.figure(figsize=(10,10))
+    plt.imshow(ori_img)
+    plt.title(f'Predicted: {CLASS_NAMES_DICT[pred]} with {(100*pred_proba):.2f}% probability')
+    plt.show()
+
+
+
 # ------------------
 
 def get_model_v1(learning_rate = 0.0001, dropout_rate = 0.2) -> tf.keras.Model:
@@ -55,6 +76,7 @@ def get_model_v1(learning_rate = 0.0001, dropout_rate = 0.2) -> tf.keras.Model:
   
     # Freezing the weights of the model
     base_model.trainable = False
+
 
     inputs = tf.keras.Input(shape = (224, 224, 3))
     data_augmentation = tf.keras.Sequential([
