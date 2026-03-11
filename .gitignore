@@ -4,11 +4,8 @@ data/*
 !data/**/
 !data/**/.gitkeep
 
-data_split/*
-!data_split/**/
-!data_split/**/.gitkeep
+data_split/
 
-!final_model.keras
 
 # Making sure the data is secure 
 *.jpg
@@ -16,10 +13,11 @@ data_split/*
 *.png
 *.svg
 *.webp
-
+*.db
 # Weights 
 *.h5
 *.keras
+!final_model.keras
 
 # Jupyter
 
