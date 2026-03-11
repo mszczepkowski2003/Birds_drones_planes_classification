@@ -1,7 +1,17 @@
 import matplotlib.pyplot as plt 
+from typing import Any
 
 
-def plot_history(history):
+def plot_history(history: Any) -> None:
+    """
+    Plots the training and validation accuracy and loss over epochs.
+
+    Args:
+        history (Any): The history object returned by model.fit().
+
+    Returns:
+        None
+    """
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
 

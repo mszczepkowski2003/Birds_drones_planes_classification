@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np 
 import matplotlib.pyplot as plt 
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 from app.config import IMG_SIZE, CLASS_NAMES_DICT
 
@@ -9,6 +9,15 @@ IMG_SHAPE = IMG_SIZE + (3,)
 
 # ---- HELPERS ----- 
 def early_stopping(patience: int) -> tf.keras.callbacks.EarlyStopping:
+    """
+    Creates an early stopping callback to prevent overfitting.
+
+    Args:
+        patience (int): Number of epochs with no improvement after which training will be stopped.
+
+    Returns:
+        tf.keras.callbacks.EarlyStopping: The early stopping callback object.
+    """
     return tf.keras.callbacks.EarlyStopping(
         monitor='val_accuracy',
         patience=patience,
@@ -18,6 +27,12 @@ def early_stopping(patience: int) -> tf.keras.callbacks.EarlyStopping:
 
 
 def lr_decay() -> tf.keras.callbacks.ReduceLROnPlateau:
+    """
+    Creates a learning rate reduction callback that triggers when a metric has stopped improving.
+
+    Returns:
+        tf.keras.callbacks.ReduceLROnPlateau: The learning rate reduction callback object.
+    """
     return tf.keras.callbacks.ReduceLROnPlateau(
         monitor='val_accuracy', 
         factor=0.2, 
@@ -26,7 +41,16 @@ def lr_decay() -> tf.keras.callbacks.ReduceLROnPlateau:
         verbose=1
     )
 
-def checkpoint(filepath)-> tf.keras.callbacks.ModelCheckpoint: 
+def checkpoint(filepath: str) -> tf.keras.callbacks.ModelCheckpoint: 
+    """
+    Creates a model checkpoint callback to save the model weights based on best validation accuracy.
+
+    Args:
+        filepath (str): Path to save the model weights.
+
+    Returns:
+        tf.keras.callbacks.ModelCheckpoint: The model checkpoint callback object.
+    """
     return tf.keras.callbacks.ModelCheckpoint(
         filepath=filepath,
         save_weights_only=True,
@@ -35,7 +59,17 @@ def checkpoint(filepath)-> tf.keras.callbacks.ModelCheckpoint:
         verbose=1
     )
 
-def get_preds(dataset, model): 
+def get_preds(dataset: tf.data.Dataset, model: tf.keras.Model) -> Tuple[np.ndarray, np.ndarray, np.ndarray]: 
+    """
+    Gets model predictions and true labels from a dataset.
+
+    Args:
+        dataset (tf.data.Dataset): The dataset containing images and labels.
+        model (tf.keras.Model): The trained model to generate predictions.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]: A tuple containing true labels, predicted labels, and raw prediction probabilities.
+    """
     y_true = []
     for images, labels in dataset:
         y_true.extend(labels.numpy())
@@ -49,6 +83,16 @@ def get_preds(dataset, model):
 
 
 def predict_single_image(imagepath: str, model: tf.keras.models.Model) -> None:
+    """
+    Predicts the class of a single image using the given model and displays the result.
+
+    Args:
+        imagepath (str): The path to the image file.
+        model (tf.keras.models.Model): The trained classification model.
+
+    Returns:
+        None
+    """
     ori_img = tf.keras.utils.load_img(imagepath)
     img = tf.keras.utils.load_img(imagepath, target_size=IMG_SIZE)
 
@@ -68,7 +112,18 @@ def predict_single_image(imagepath: str, model: tf.keras.models.Model) -> None:
 
 # ------------------
 
-def get_model_v1(learning_rate = 0.0001, dropout_rate = 0.2) -> tf.keras.Model:
+def get_model_v1(learning_rate: float = 0.0001, dropout_rate: float = 0.2) -> tf.keras.Model:
+    """
+    Builds and compiles MobileNetV3Large classification model version 1 (no fine-tuning).
+    The base model weights are frozen.
+
+    Args:
+        learning_rate (float, optional): Learning rate for the Adam optimizer. Defaults to 0.0001.
+        dropout_rate (float, optional): Dropout rate for regularization. Defaults to 0.2.
+
+    Returns:
+        tf.keras.Model: The compiled classification model.
+    """
     #Loading the weights of the model 
     base_model = tf.keras.applications.MobileNetV3Large(input_shape = IMG_SHAPE,
                                                 include_top = False,
@@ -106,7 +161,19 @@ def get_model_v1(learning_rate = 0.0001, dropout_rate = 0.2) -> tf.keras.Model:
     
     return model
 
-def get_model_v2(fine_tune_at : int, learning_rate : float = 0.0001, dropout_rate : float = 0.2) -> tf.keras.Model:
+def get_model_v2(fine_tune_at: int, learning_rate: float = 0.0001, dropout_rate: float = 0.2) -> tf.keras.Model:
+    """
+    Builds and compiles MobileNetV3Large classification model version 2 (with fine-tuning).
+    Allows fine-tuning from a specific layer onwards.
+
+    Args:
+        fine_tune_at (int): The index of the layer from which to start unfreezing weights for fine-tuning.
+        learning_rate (float, optional): Learning rate for the Adam optimizer. Defaults to 0.0001.
+        dropout_rate (float, optional): Dropout rate for regularization. Defaults to 0.2.
+
+    Returns:
+        tf.keras.Model: The compiled classification model ready for fine-tuning.
+    """
     #Loading the weights of the model 
     base_model = tf.keras.applications.MobileNetV3Large(input_shape = IMG_SHAPE,
                                                 include_top = False,

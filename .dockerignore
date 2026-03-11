@@ -1,0 +1,32 @@
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Mac / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Git
+.git
+.gitignore
+
+# Data
+data/
+data_split/
+*/jpg
+*/jpeg
+*/png
+*/webp

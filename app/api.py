@@ -2,11 +2,12 @@ from PIL import Image
 import numpy as np
 import io
 from fastapi import FastAPI, File, UploadFile, HTTPException, status
-from pydantic import BaseModel
+
 from pathlib import Path
 import tensorflow as tf
 from app.config import IMG_SIZE, CLASS_NAMES_DICT
-from typing import List, Annotated
+from typing import List, Dict, Any
+
 from app.api_helpers import predict_image_api, predict_batch_api
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -21,7 +22,16 @@ except Exception as e:
 
 
 @app.post("/predict")
-async def predict_image(file: UploadFile = File(...)):
+async def predict_image(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """
+    Endpoint for reading and predicting the class of a single image file.
+
+    Args:
+        file (UploadFile): Image file in format such as png, jpg, jpeg, or webp.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the filename, predicted class, and confidence score.
+    """
     # 1. Reading the bytes of the file 
     contents = await file.read()
     # 2. Converting the contents to image
@@ -36,8 +46,20 @@ async def predict_image(file: UploadFile = File(...)):
 
 @app.post("/predict-batch")
 async def predict_batch_of_images(
-    files: list[UploadFile] = File(...)
-):
+    files: List[UploadFile] = File(...)
+) -> List[Dict[str, Any]]:
+    """
+    Endpoint for reading and predicting the classes of a batch of images (maximum 32).
+
+    Args:
+        files (List[UploadFile]): A list of image files in format such as png, jpg, jpeg, or webp.
+
+    Returns:
+        List[Dict[str, Any]]: A list of dictionaries, each containing the filename, predicted class, and confidence score.
+
+    Raises:
+        HTTPException: If the requested batch size exceeds the maximum limit (32).
+    """
     MAX_BATCH_SIZE = 32
     all_images = []
     filenames = []

@@ -1,14 +1,14 @@
-#data
-data/
-  .gitignore
-  Aeroplanes/
-      .gitkeep
-  Birds/
-      .gitkeep
-  Drones/
-      .gitkeep
+```ignore
+# Data
+data/*
+!data/**/
+!data/**/.gitkeep
 
-data_split/
+data_split/*
+!data_split/**/
+!data_split/**/.gitkeep
+
+!final_model.keras
 
 # Making sure the data is secure 
 *.jpg
@@ -37,6 +37,7 @@ data_split/
 .vscode/
 .idea
 
-#logs
+# logs
 logs/
 *.log
+```

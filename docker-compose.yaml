@@ -1,0 +1,28 @@
+version: '3.8' # Specifies the version of the Docker Compose file format. '3.8' is widely supported.
+
+services:
+  # The name of our service. You can call this whatever you want (e.g., 'web', 'backend').
+  api:
+    # Instructions for building the Docker image for this service.
+    build:
+      # The context defines the directory containing the Dockerfile and source code.
+      # '.' means the current directory.
+      context: .
+
+    # The name given to the built Docker image. 
+    image: bda-api-img
+
+    # The name to assign to the running container. This makes it easier to identify
+    # the container when using commands like `docker ps`.
+    container_name: bda-api
+
+    # Port mapping configuration: "host_port:container_port".
+    # This exposes port 8000 on your host machine and maps it to port 8000 
+    # inside the container (which is where uvicorn is running).
+    ports:
+      - "8000:8000"
+
+    # Defines the restart policy for the container. 
+    # 'unless-stopped' means the container will always restart if it crashes or the docker daemon restarts,
+    # unless you explicitly stop it yourself.
+    restart: unless-stopped

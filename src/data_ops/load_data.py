@@ -7,14 +7,19 @@ import shutil
 from dotenv import load_dotenv
 import tensorflow as tf 
 from src.model.config import RANDOM_STATE, BATCH_SIZE, IMG_SIZE
-from typing import Tuple, List
+from typing import Tuple, List, Dict, Any
 
 
 
 
 def split_data() -> None:
-    input_dir = '../data/' 
-    output_dir = '../data_split/' 
+    """
+    Splits the original dataset located in '../data/' into train, validation, and test 
+    datasets with a ratio of 70%, 15%, and 15% respectively. The resulting split datasets 
+    are moved to the '../data_split/' directory.
+    """
+    input_dir: str = '../data/' 
+    output_dir: str = '../data_split/' 
 
     splitfolders.ratio(
         input_dir, 
@@ -26,8 +31,16 @@ def split_data() -> None:
 
 
 def del_broken_images(data_path: str) -> None:
+    """
+    Iterates through the given directory to find and delete any broken or unreadable image files.
+    It also standardizes valid images by converting them to the RGB color space and saving them
+    as JPEG files to prevent issues during model training.
+    
+    Args:
+        data_path (str): The root directory path containing the images to be checked.
+    """
 
-    data_dir = Path(data_path)
+    data_dir: Path = Path(data_path)
 
     for img_path in data_dir.rglob('*'):
         if img_path.is_file() and img_path.suffix.lower() in ['.jpg', '.jpeg', '.png', '.bmp']:
@@ -44,12 +57,27 @@ def del_broken_images(data_path: str) -> None:
 
 
 def get_data(data_path: str) -> Tuple[List[str], tf.data.Dataset, tf.data.Dataset, tf.data.Dataset]:
+    """
+    Loads images from the specified directory path to construct and return TensorFlow 
+    Dataset objects for training, validation, and testing. It also optimizes the datasets 
+    for faster training by utilizing caching and prefetching.
+    
+    Args:
+        data_path (str): The root directory path containing subdirectories 'train', 'val', and 'test'.
+        
+    Returns:
+        Tuple containing:
+            - List of class names (str) derived from the dataset subdirectories.
+            - Training dataset.
+            - Validation dataset.
+            - Testing dataset.
+    """
 
-    train_dir = f'{data_path}/train'
-    val_dir = f'{data_path}/val'
-    test_dir = f'{data_path}/test'
+    train_dir: str = f'{data_path}/train'
+    val_dir: str = f'{data_path}/val'
+    test_dir: str = f'{data_path}/test'
 
-    loader_params = {
+    loader_params: Dict[str, Any] = {
         'batch_size': BATCH_SIZE,
         'image_size': IMG_SIZE,
         'label_mode': 'int'
@@ -64,8 +92,8 @@ def get_data(data_path: str) -> Tuple[List[str], tf.data.Dataset, tf.data.Datase
                                                                 shuffle=False,
                                                                 **loader_params)
     
-    cm = train_dataset.class_names
-    AUTOTUNE = tf.data.AUTOTUNE # Dynamically checks How many batches CPU should hold in buffer
+    cm: List[str] = train_dataset.class_names
+    AUTOTUNE: int = tf.data.AUTOTUNE # Dynamically checks How many batches CPU should hold in buffer
 
     #cache and prefetch for faster learning
     train_dataset = train_dataset.cache().prefetch(buffer_size=AUTOTUNE) 
